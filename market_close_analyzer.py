@@ -13,9 +13,9 @@ from datetime import datetime, timedelta, date
 from typing import List, Dict
 import pandas as pd
 import logging
-import openai
+import google.generativeai as genai
 
-from config import OPENAI_API_KEY, LLM_MODEL, MAX_TOKENS, DATA_DIR
+from config import GOOGLE_API_KEY, LLM_MODEL, MAX_TOKENS, DATA_DIR
 from theme_analyzer import (
     ThemeAnalyzer,
     StockSignalAnalyzer,
@@ -23,7 +23,10 @@ from theme_analyzer import (
 
 logger = logging.getLogger(__name__)
 
-client = openai.OpenAI(api_key=OPENAI_API_KEY)
+if GOOGLE_API_KEY:
+    genai.configure(api_key=GOOGLE_API_KEY)
+else:
+    logger.warning("GOOGLE_API_KEY가 설정되지 않았습니다.")
 
 
 # ─────────────────────────────────────────────
@@ -499,24 +502,18 @@ class MarketCloseAnalyzer:
 """
 
         try:
-            response = self.client.chat.completions.create(
-                model=LLM_MODEL,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "한국 주식시장 단기 트레이딩 전문가. "
-                            "데이터 기반 분석, 구체적 종목 추천, "
-                            "반드시 리스크와 손절 라인 함께 제시. "
-                            "거래량과 수급을 매우 중시."
-                        ),
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                max_tokens=MAX_TOKENS,
-                temperature=0.3,
+            # Gemini 모델 인스턴스 생성 (필요 시)
+            model = genai.GenerativeModel(model_name=LLM_MODEL)
+            
+            # Gemini 호출
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    max_output_tokens=MAX_TOKENS,
+                    temperature=0.3,
+                )
             )
-            return response.choices[0].message.content
+            return response.text
 
         except Exception as e:
             logger.error(f"장마감 리포트 생성 실패: {e}")

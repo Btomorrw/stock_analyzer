@@ -8,3 +8,4 @@ python-dotenv>=1.0.0
 holidays>=0.40
 pandas>=2.0.0
 lxml>=4.9.0
+google-generativeai>=0.3.0

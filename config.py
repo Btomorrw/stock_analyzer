@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 # === API Keys ===
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
@@ -36,7 +36,7 @@ MARKET_CLOSE_TIME = "14:30"        # 장마감 분석 시간
 TRADING_DAYS = [0, 1, 2, 3]  # 월(0)~목(3), 필요시 금(4) 추가
 
 # === LLM 설정 ===
-LLM_MODEL = "gpt-4o"
+LLM_MODEL = "gemini-1.5-flash"  # Google Gemini 모델
 MAX_TOKENS = 4000
 
 # === 프로젝트 경로 ===
@@ -50,8 +50,11 @@ def validate_env():
     """필수 환경변수가 설정되었는지 검증"""
     missing = []
 
-    if not OPENAI_API_KEY or OPENAI_API_KEY.startswith("sk-xxxx"):
-        missing.append("OPENAI_API_KEY")
+    if not GOOGLE_API_KEY or GOOGLE_API_KEY.startswith("AIza"):
+        # 실제 키가 입력되어 있으면 통과, AIza... 형식의 플레이스홀더면 미기입으로 처리
+        # 사용자가 제공한 키는 AIzaSyA... 이므로, 여기서는 단순히 존재 여부만 체크하도록 함
+        if not GOOGLE_API_KEY:
+            missing.append("GOOGLE_API_KEY")
 
     if not TELEGRAM_BOT_TOKEN or TELEGRAM_BOT_TOKEN.startswith("1234567890"):
         missing.append("TELEGRAM_BOT_TOKEN")
