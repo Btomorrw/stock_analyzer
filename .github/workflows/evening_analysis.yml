@@ -1,0 +1,43 @@
+name: 🌙 저녁 증시요약 분석 (18:00 KST)
+
+on:
+  schedule:
+    # 평일(월~금) 18:00 KST = 09:00 UTC
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:   # 수동 실행 버튼
+
+jobs:
+  evening-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 🐍 Python 3.11 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 🌙 저녁 증시요약 크롤링 & 분석 실행
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+        run: python scheduler.py --job evening
+
+      - name: 📁 로그 업로드 (아티팩트)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evening-log-${{ github.run_id }}
+          path: stock_analyzer.log
+          retention-days: 7

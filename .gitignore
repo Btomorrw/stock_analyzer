@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+
+# 환경 설정 (절대 Git에 올리지 말 것!)
+.env
+
+# 출력/데이터 디렉토리 (로컬에만 저장)
+output/
+data/
+
+# 로그
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# 테스트 스크립트
+_test_*.py
