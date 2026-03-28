@@ -15,12 +15,16 @@ from typing import List, Dict, Optional, Tuple
 import json
 import time as t
 import logging
-import openai
-from config import OPENAI_API_KEY, LLM_MODEL
+import google.generativeai as genai
+from config import GOOGLE_API_KEY, LLM_MODEL, MAX_TOKENS
 
 logger = logging.getLogger(__name__)
 
-client = openai.OpenAI(api_key=OPENAI_API_KEY)
+# Gemini 설정
+if GOOGLE_API_KEY:
+    genai.configure(api_key=GOOGLE_API_KEY)
+else:
+    logger.warning("GOOGLE_API_KEY가 설정되지 않았습니다.")
 
 
 # ─────────────────────────────────────────────
@@ -428,7 +432,7 @@ class ThemeAnalyzer:
         self.theme_crawler = NaverThemeCrawler()
         self.sector_analyzer = SectorAnalyzer()
         self.signal_analyzer = StockSignalAnalyzer()
-        self.client = client
+        self.model = genai.GenerativeModel(model_name=LLM_MODEL)
 
     def get_full_theme_analysis(self) -> Dict:
         """
@@ -552,23 +556,14 @@ class ThemeAnalyzer:
 """
 
         try:
-            response = self.client.chat.completions.create(
-                model=LLM_MODEL,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "한국 주식시장 테마/모멘텀 트레이딩 전문가. "
-                            "데이터 기반으로 구체적 분석을 제공하며, "
-                            "거래량과 수급을 중시합니다."
-                        ),
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                max_tokens=4000,
-                temperature=0.3,
+            response = self.model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    max_output_tokens=MAX_TOKENS,
+                    temperature=0.3,
+                )
             )
-            return response.choices[0].message.content
+            return response.text
 
         except Exception as e:
             logger.error(f"테마 리포트 생성 실패: {e}")
