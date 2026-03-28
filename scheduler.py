@@ -43,11 +43,11 @@ def is_trading_day() -> bool:
     return True
 
 
-def job_evening_analysis():
+def job_evening_analysis(force: bool = False):
     """
     📋 저녁 6시: 인포스탁 '증시요약' 기사 수집 → AI 분석 → 전송
     """
-    if not is_trading_day():
+    if not force and not is_trading_day():
         return
 
     logger.info("=" * 50)
@@ -82,12 +82,12 @@ def job_evening_analysis():
         Notifier().send_telegram(f"❌ 저녁 분석 오류: {e}")
 
 
-def job_morning_analysis():
+def job_morning_analysis(force: bool = False):
     """
     📋 Task 4+5: 아침 8시
     (기존 코드에 성과 추적 추가)
     """
-    if not is_trading_day():
+    if not force and not is_trading_day():
         return
 
     logger.info("=" * 50)
@@ -124,12 +124,12 @@ def job_morning_analysis():
         Notifier().send_telegram(f"❌ 아침 브리핑 오류: {e}")
 
 
-def job_market_close_analysis():
+def job_market_close_analysis(force: bool = False):
     """
     📋 Task 6: 오후 2:30
     장마감 종합 분석 → 내일 상승 연속 종목 추천
     """
-    if not is_trading_day():
+    if not force and not is_trading_day():
         return
 
     logger.info("=" * 50)
@@ -179,8 +179,8 @@ def run_job(job_name: str):
         logger.error(f"알 수 없는 잡: {job_name} (선택 가능: {list(jobs.keys())})")
         raise SystemExit(1)
 
-    logger.info(f"▶ 단발성 실행: {job_name}")
-    jobs[job_name]()
+    logger.info(f"▶ 단발성 실행: {job_name} (강제 실행 모드)")
+    jobs[job_name](force=True)
     logger.info(f"✅ {job_name} 완료")
 
 
