@@ -2,8 +2,8 @@ name: 📈 장마감 분석 (14:30 KST)
 
 on:
   schedule:
-    # 평일(월~금) 14:30 KST = 05:30 UTC
-    - cron: '30 5 * * 1-5'
+    # 매일 평일(월-금) 14:20 KST (05:20 UTC)
+    - cron: '20 5 * * 1-5'
   workflow_dispatch:   # 수동 실행 버튼
 
 jobs:

@@ -28,12 +28,12 @@ NEWS_KEYWORD_PREFIX = "증시요약"  # 뉴스 제목 필터 (title contains)
 NEWS_COUNT = 6  # 수집할 뉴스 수 (기술적 분석 특징주 제외 시 증시요약 1~6)
 
 # === 스케줄 설정 ===
-MORNING_ANALYSIS_TIME = "08:00"    # 아침 분석 시간
-EVENING_CRAWL_TIME = "18:00"       # 저녁 뉴스 수집 시간
-MARKET_CLOSE_TIME = "14:30"        # 장마감 분석 시간
+MORNING_ANALYSIS_TIME = "07:40"    # 아침 분석 시간
+EVENING_CRAWL_TIME = "20:00"       # 저녁 뉴스 수집 시간
+MARKET_CLOSE_TIME = "14:20"        # 장마감 분석 시간
 
 # === 공휴일/휴장일 ===
-TRADING_DAYS = [0, 1, 2, 3]  # 월(0)~목(3), 필요시 금(4) 추가
+TRADING_DAYS = [0, 1, 2, 3, 4]  # 월(0)~금(4)
 
 # === LLM 설정 ===
 LLM_MODEL = "gemini-1.5-flash"  # Google Gemini 모델
