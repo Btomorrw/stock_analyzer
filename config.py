@@ -36,7 +36,7 @@ MARKET_CLOSE_TIME = "14:20"        # 장마감 분석 시간
 TRADING_DAYS = [0, 1, 2, 3, 4]  # 월(0)~금(4)
 
 # === LLM 설정 ===
-LLM_MODEL = "gemini-1.5-flash"  # Google Gemini 모델
+LLM_MODEL = "gemini-1.5-flash-latest"  # Google Gemini 모델
 MAX_TOKENS = 4000
 
 # === 프로젝트 경로 ===

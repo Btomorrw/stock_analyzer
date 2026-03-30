@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, date
 from typing import List, Dict
 import pandas as pd
 import logging
+import os
 import google.generativeai as genai
 
 from config import GOOGLE_API_KEY, LLM_MODEL, MAX_TOKENS, DATA_DIR
@@ -390,7 +391,6 @@ class MarketCloseAnalyzer:
         self.market_data = MarketDataCollector()
         self.theme_analyzer = ThemeAnalyzer()
         self.continuation_filter = ContinuationFilter()
-        self.client = client
 
     def collect_all_data(self) -> Dict:
         """모든 분석 데이터 수집"""
@@ -693,6 +693,10 @@ class PerformanceTracker:
         try:
             from pykrx import stock
 
+            if not os.path.exists(self.history_file):
+                logger.info("추천 기록 파일이 없어 성과를 업데이트하지 않습니다.")
+                return
+
             with open(self.history_file, "r", encoding="utf-8") as f:
                 history = json.load(f)
 
@@ -753,6 +757,9 @@ class PerformanceTracker:
     def get_hit_rate_summary(self) -> str:
         """적중률 요약"""
         try:
+            if not os.path.exists(self.history_file):
+                return "아직 추적 데이터가 없습니다."
+
             with open(self.history_file, "r", encoding="utf-8") as f:
                 history = json.load(f)
 
