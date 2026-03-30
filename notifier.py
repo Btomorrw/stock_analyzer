@@ -44,10 +44,14 @@ class Notifier:
     def send_telegram(self, message: str) -> bool:
         """텔레그램 메시지 전송"""
         try:
+            import time
             # 텔레그램 메시지 길이 제한 (4096자)
             chunks = self._split_message(message, 4000)
 
-            for chunk in chunks:
+            for i, chunk in enumerate(chunks):
+                if i > 0:
+                    time.sleep(1.5)  # Telegram API 속도 제한(Rate Limit) 방지
+
                 url = (
                     f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
                     f"/sendMessage"
@@ -61,9 +65,12 @@ class Notifier:
                 response = requests.post(url, json=payload, timeout=10)
 
                 if response.status_code != 200:
-                    # Markdown 파싱 실패 시 일반 텍스트로 재시도
+                    # Markdown 파싱 실패 등으로 거절되었을 수 있으므로 일반 텍스트로 재시도
+                    logger.warning(f"Telegram Markdown 전송 실패, 일반 텍스트 재시도: {response.text}")
                     payload.pop("parse_mode", None)
-                    requests.post(url, json=payload, timeout=10)
+                    retry_res = requests.post(url, json=payload, timeout=10)
+                    if retry_res.status_code != 200:
+                        logger.error(f"Telegram 일반 텍스트 전송 조차 실패: {retry_res.text}")
 
             logger.info("✅ 텔레그램 전송 성공")
             return True
